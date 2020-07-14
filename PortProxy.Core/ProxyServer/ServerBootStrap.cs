@@ -66,9 +66,13 @@ namespace PortProxy.ProxyServer
 			}
 
 			_server = _serviceProvider.GetRequiredService<Server>();
-			_server.Start();
+			_server.Prepare();
+            for (int i = 0; i < 1; i++)
+            {
+                _server.Start2(i);
+            }
 
-			_serviceProvider.GetRequiredService<IHttpServer>().Start();
+            _serviceProvider.GetRequiredService<IHttpServer>().Start();
 			_serviceProvider.GetRequiredService<IStatistics>();
 		}
 

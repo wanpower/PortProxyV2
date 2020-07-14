@@ -74,7 +74,7 @@ namespace PortProxy.Connection
 				var data = BitConverter.ToInt64(buffer, 0);
 				var time = data ^ _seed.TimeKey;
 
-				if (Math.Abs(DateTime.UtcNow.Ticks - time) / 10000 / 1000 > 10)
+				if (Math.Abs(DateTime.UtcNow.Ticks - time) / 10000 / 1000 > 120)
 				{
 					//最长前后10秒钟
 					_logger.LogInformation($"[{context.Id}] 验证错误 -> 数据时间超过限制，请求时间：{new DateTime(time, DateTimeKind.Utc)}");

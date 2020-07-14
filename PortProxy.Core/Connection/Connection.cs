@@ -1,7 +1,8 @@
 namespace PortProxy.Connection
 {
 	using System;
-	using System.IO;
+    using System.Collections.Generic;
+    using System.IO;
 	using System.Net.Sockets;
 	using System.Threading.Tasks;
 
@@ -19,7 +20,7 @@ namespace PortProxy.Connection
 		private ServerConfig _config;
 		ISeed _seed;
 
-		public Connection(IServiceProvider serviceProvider, ConnectionContext context)
+        public Connection(IServiceProvider serviceProvider, ConnectionContext context)
 		{
 			_serviceProvider = serviceProvider;
 			_logger = _serviceProvider.GetService<ILogger<Connection>>();
@@ -27,6 +28,9 @@ namespace PortProxy.Connection
 			_seed = serviceProvider.GetService<ISeed>();
 			_context = context;
 			_local = _config.Local;
+
+            PortMaps.Initize();
+            
 		}
 
 		public async Task ProcessClientAsync()
@@ -79,7 +83,21 @@ namespace PortProxy.Connection
 				try
 				{
 					_logger.LogInformation($"[{id}] 正在连接上游服务器");
-					await upclient.ConnectAsync(_config.RemoteServer, _config.RemoteServerPort);
+                    if (_local)
+                    {
+                        try {
+                            await upclient.ConnectAsync(PortMaps.level2servers[new Random().Next(PortMaps.level2servers.Length)], int.Parse(client.Client.LocalEndPoint.ToString().Split(':')[1]));
+                        } catch { }
+                        //await upclient.ConnectAsync(_config.RemoteServer, int.Parse(client.Client.LocalEndPoint.ToString().Split(':')[1]));
+                    }
+                    else {
+                        //await upclient.ConnectAsync(_config.RemoteServer, _config.RemoteServerPort);
+                        try {
+                            await upclient.ConnectAsync(PortMaps.level3portservers[client.Client.LocalEndPoint.ToString().Split(':')[1]], 44444);
+                        } catch {
+                        }
+                    }
+					
 					upstream = upclient.GetStream();
 					_logger.LogInformation($"[{id}] 上游服务器连接已打开 {upclient.Client.LocalEndPoint} -> {upclient.Client.RemoteEndPoint}");
 

@@ -44,8 +44,9 @@ namespace PortProxy.WinService
 			}
 
 			cfg.GuiMode = true;
-
-			var psi = new ProcessStartInfo(System.Reflection.Assembly.GetEntryAssembly().Location, cfg.GetCmdLine());
+            Console.WriteLine(System.Reflection.Assembly.GetEntryAssembly().Location);
+            Console.WriteLine(cfg.GetCmdLine());
+            var psi = new ProcessStartInfo(System.Reflection.Assembly.GetEntryAssembly().Location, cfg.GetCmdLine());
 			await StartProcessAsync(psi, cfg.LocalServer.Contains("*"));
 		}
 
